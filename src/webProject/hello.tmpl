@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>Hello</title>
+</head>
+<body>
+{{/*基础使用方式*/}}
+    <p>Hello {{.user.Name}}</p>
+{{/*声明变量的语法*/}}
+    <p>{{$name := .user.Name}}</p>
+    <p>你好 {{$name}}</p>
+{{/*移除空格的语法*/}}
+    <p>移除空格的写法:{{- .user.Age -}}</p>
+<hr>
+{{if eq .user.Age 500}}
+<p>Age 拥有值</p>
+{{else}}
+<p>Age 没有值</p>
+{{end}}
+{{/*遍历语法*/}}
+{{$list :=.list}}
+{{range $k,$v:= $list}}
+<p>{{$k}}--{{$v}}</p>
+{{end}}
+{{/*range的生成的变量作用域只为range方法内*/}}
+<p>range中的key不能在作用域外使用</p>
+{{/*使用with让某个变量只在该作用域有用*/}}
+{{with $age:=.user.Age}}
+    <p>with作用域内的age:{{$age}}</p>
+{{end}}
+</body>
+</html>

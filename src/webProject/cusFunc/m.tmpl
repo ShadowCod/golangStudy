@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>template嵌套</title>
+</head>
+<body>
+{{/*输出嵌套的模版内容*/}}
+{{/*注意template后面接的是文件名称*/}}
+{{template "ul.tmpl"}}
+<hr>
+{{/*输出使用define定义的模版*/}}
+{{template "ol.tmpl"}}
+<hr>
+hello {{.}}
+</body>
+</html>
+
+{{/*通过define定义一个模版*/}}
+{{/*注意：define后面接的是模版的名称*/}}
+{{define "ol.tmpl"}}
+    <ol>
+        <li>吃饭</li>
+        <li>睡觉</li>
+        <li>打豆豆</li>
+    </ol>
+{{end}}

@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <meta charset="UTF-8"/>
+    </head>
+    <body>
+        <!-- 模版文件中的内容<br>
+        {{if .}}
+        我要显示
+        {{end}}
+        <hr />
+        {{if .}}
+        如果传过来的是true将显示这部分内容
+        {{else}}
+        else中的内容
+        {{end}} [条件动作]-->
+        <!-- {{range .}}
+        {{.}}<br>
+        遍历到的元素为:{{.Name}}
+        {{else}}
+        没有遍历到任何元素
+        {{end}} [迭代动作]-->
+        {{with "太子"}}
+        <div>新的值{{.}}</div>
+        {{end}}
+        <hr/>
+        {{with ""}}
+        <div>修改后的数据{{.}}</div>
+        {{else}}
+        <div>传过来的数据仍是{{.}}</div>
+        {{end}}
+    </body>
+</html>

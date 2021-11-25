@@ -1,0 +1,6 @@
+{{/*继承根模版*/}}
+{{template "base.tmpl" .}}
+{{/*填充内容    注意：使用define定义模版*/}}
+{{define "context" }}
+    hello {{.}}
+{{end}}

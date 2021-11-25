@@ -1,0 +1,9 @@
+//指定版本号
+syntax "proto3";
+//指定包名
+package pb
+
+//定义消息体
+message Student{
+    int32 age 1
+}
