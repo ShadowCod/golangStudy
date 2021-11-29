@@ -1,6 +1,7 @@
 package znet
 
 import (
+	"errors"
 	"fmt"
 	"net"
 )
@@ -28,6 +29,15 @@ func CreateServer(name string) (s *Server) {
 	return
 }
 
+//定义连接绑定的handle api
+func CallBackClient(conn *net.TCPConn,data []byte,cnt int)error{
+	fmt.Println("[Conn Handle] CallBack...")
+	if _,err:=conn.Write(data[:cnt]);err!=nil{
+		return errors.New("[Conn HandLe]CallBack err")
+	}
+	return nil
+}
+
 // Start 实现接口的start方法
 func (s *Server) Start() {
 	fmt.Printf("%s,starting\n", s.Name)
@@ -52,26 +62,31 @@ func (s *Server) Start() {
 				fmt.Println("listener accept err:", err)
 				continue
 			}
+			var connID uint32= 0
+			//将处理新连接的业务方法和conn进行绑定，得到自定义的连接模块
+			dealConn :=CreateConnection(conn,connID,CallBackClient)
+			connID++
+			go dealConn.Start()
 			// 做一个简单的最大512字节的回应(每一个连接开启一个协程专门负责回应)
-			go func() {
-				// 创建一个存放信息的
-				info := make([]byte, 512)
-				for {
-					// 读取发送过来的信息
-					cnt, err := conn.Read(info)
-					fmt.Println("server read ", cnt, info)
-					if err != nil {
-						fmt.Println("read err,err:", err)
-						continue
-					}
-					// 回写
-					_, err = conn.Write(info[:cnt])
-					if err != nil {
-						fmt.Println("write err,err:", err)
-						continue
-					}
-				}
-			}()
+			//go func() {
+			//	// 创建一个存放信息的
+			//	info := make([]byte, 512)
+			//	for {
+			//		// 读取发送过来的信息
+			//		cnt, err := conn.Read(info)
+			//		fmt.Println("server read ", cnt, info)
+			//		if err != nil {
+			//			fmt.Println("read err,err:", err)
+			//			continue
+			//		}
+			//		// 回写
+			//		_, err = conn.Write(info[:cnt])
+			//		if err != nil {
+			//			fmt.Println("write err,err:", err)
+			//			continue
+			//		}
+			//	}
+			//}()
 		}
 	}()
 

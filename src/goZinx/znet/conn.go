@@ -30,20 +30,36 @@ func CreateConnection(conn *net.TCPConn, connID uint32, callBackAPI ziface.Handl
 //StartRead start方法中需要的读取信息方法
 func (c *Connection) StartRead() {
 	fmt.Println("start read")
+	defer fmt.Println("connID=",c.ConnID,"Reader is exit ,remote addr is ",c.RemoteAddr().String())
+	defer c.Stop()
+	for {
+		//读取客户端的数据到buf中
+		buf:=make([]byte,512)
+		cnt,err:=c.Conn.Read(buf)
+		if err !=nil{
+			fmt.Println("recv buf err",err)
+			continue
+		}
 
+		//调用当前连接所绑定的HandleAPI
+		if err = c.HandleAPI(c.Conn,buf,cnt);err !=nil{
+			fmt.Println("ConnID",c.ConnID,"handle is err",err)
+			break
+		}
+	}
 }
 
 //Start 启动连接的方法
 func (c *Connection) Start() {
 	fmt.Println("conn start()...,connID:", c.ConnID)
 	// 启动从当前的连接中读取数据
-	c.StartRead()
+	go c.StartRead()
 	// TODO
 }
 
 //Stop 停止连接的方法
 func (c *Connection) Stop() {
-	fmt.Println("conn stoping...,connID:", c.ConnID)
+	fmt.Println("conn stop()...,connID:", c.ConnID)
 	//如果已经关闭就不必继续执行了
 	if c.IsClosed {
 		return
