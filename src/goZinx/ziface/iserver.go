@@ -1,7 +1,7 @@
 package ziface
 
 // Interface 定义一个接口类型
-type Interface interface {
+type IServer interface {
 	// 开始服务
 	Start()
 	// 停止服务

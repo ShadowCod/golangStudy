@@ -5,11 +5,11 @@ import "net"
 /*
 	连接需要实现的方法
 */
-type ConnInterface interface {
+type IConnection interface {
 	// 启动连接，开始工作
 	Start()
 	// 停止连接，关闭工作
-	Close()
+	Stop()
 	// 获取当前连接的conn（套接字）
 	GetTCPConn() *net.TCPConn
 	// 获取连接ID

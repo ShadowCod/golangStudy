@@ -4,12 +4,12 @@ import "goZinx/ziface"
 
 type Request struct{
 	//已经和客户端建立好的连接
-	conn ziface.ConnInterface
+	conn ziface.IConnection
 	//客户端请求的数据
 	data []byte
 }
 
-func (r *Request) GetConnection() ziface.ConnInterface{
+func (r *Request) GetConnection() ziface.IConnection{
 	return r.conn
 }
 

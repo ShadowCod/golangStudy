@@ -88,6 +88,6 @@ func (c *Connection) RemoteAddr() net.Addr {
 }
 
 //Send 给客户端发送消息的方法
-func (c *Connection) Send() error {
+func (c *Connection) Send(data []byte) error {
 	return nil
 }
