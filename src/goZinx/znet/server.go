@@ -1,8 +1,8 @@
 package znet
 
 import (
-	"errors"
 	"fmt"
+	"goZinx/ziface"
 	"net"
 )
 
@@ -16,6 +16,8 @@ type Server struct {
 	IP string
 	// 服务器使用端口
 	Port int
+	// 当前server添加路由
+	Router ziface.IRouter
 }
 
 // CreateServer 创建Server的函数
@@ -25,18 +27,19 @@ func CreateServer(name string) (s *Server) {
 		IPVersion: "tcp4",
 		IP:        "127.0.0.1",
 		Port:      8999,
+		Router:    nil,
 	}
 	return
 }
 
 //定义连接绑定的handle api
-func CallBackClient(conn *net.TCPConn,data []byte,cnt int)error{
-	fmt.Println("[Conn Handle] CallBack...")
-	if _,err:=conn.Write(data[:cnt]);err!=nil{
-		return errors.New("[Conn HandLe]CallBack err")
-	}
-	return nil
-}
+//func CallBackClient(conn *net.TCPConn,data []byte,cnt int)error{
+//	fmt.Println("[Conn Handle] CallBack...")
+//	if _,err:=conn.Write(data[:cnt]);err!=nil{
+//		return errors.New("[Conn HandLe]CallBack err")
+//	}
+//	return nil
+//}
 
 // Start 实现接口的start方法
 func (s *Server) Start() {
@@ -55,6 +58,7 @@ func (s *Server) Start() {
 			fmt.Println("listen addr err:", err)
 			return
 		}
+		var connID uint32 = 0
 		// 3.等待客户端连接（使用for循环等待）
 		for {
 			conn, err := listener.AcceptTCP()
@@ -62,9 +66,8 @@ func (s *Server) Start() {
 				fmt.Println("listener accept err:", err)
 				continue
 			}
-			var connID uint32= 0
 			//将处理新连接的业务方法和conn进行绑定，得到自定义的连接模块
-			dealConn :=CreateConnection(conn,connID,CallBackClient)
+			dealConn := CreateConnection(conn, connID, s.Router)
 			connID++
 			go dealConn.Start()
 			// 做一个简单的最大512字节的回应(每一个连接开启一个协程专门负责回应)
@@ -105,4 +108,8 @@ func (s *Server) Serve() {
 
 	//	等待
 	select {}
+}
+
+func (s *Server) AddRouter(router ziface.IRouter) {
+	s.Router = router
 }

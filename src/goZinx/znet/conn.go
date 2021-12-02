@@ -8,21 +8,21 @@ import (
 
 //Connection 连接模块属性
 type Connection struct {
-	Conn      *net.TCPConn
-	ConnID    uint32
-	IsClosed  bool
-	HandleAPI ziface.HandleFunc
-	ExitChan  chan bool
+	Conn     *net.TCPConn
+	ConnID   uint32
+	IsClosed bool
+	ExitChan chan bool
+	Router   ziface.IRouter
 }
 
 //CreateConnection 创建连接模块的方法
-func CreateConnection(conn *net.TCPConn, connID uint32, callBackAPI ziface.HandleFunc) *Connection {
+func CreateConnection(conn *net.TCPConn, connID uint32, router ziface.IRouter) *Connection {
 	c := &Connection{
-		Conn:      conn,
-		ConnID:    connID,
-		IsClosed:  false,
-		HandleAPI: callBackAPI,
-		ExitChan:  make(chan bool, 1),
+		Conn:     conn,
+		ConnID:   connID,
+		Router:   router,
+		IsClosed: false,
+		ExitChan: make(chan bool, 1),
 	}
 	return c
 }
@@ -30,22 +30,34 @@ func CreateConnection(conn *net.TCPConn, connID uint32, callBackAPI ziface.Handl
 //StartRead start方法中需要的读取信息方法
 func (c *Connection) StartRead() {
 	fmt.Println("start read")
-	defer fmt.Println("connID=",c.ConnID,"Reader is exit ,remote addr is ",c.RemoteAddr().String())
+	defer fmt.Println("connID=", c.ConnID, "Reader is exit ,remote addr is ", c.RemoteAddr().String())
 	defer c.Stop()
 	for {
 		//读取客户端的数据到buf中
-		buf:=make([]byte,512)
-		cnt,err:=c.Conn.Read(buf)
-		if err !=nil{
-			fmt.Println("recv buf err",err)
+		buf := make([]byte, 512)
+		_, err := c.Conn.Read(buf)
+		if err != nil {
+			fmt.Println("recv buf err", err)
 			continue
 		}
 
-		//调用当前连接所绑定的HandleAPI
-		if err = c.HandleAPI(c.Conn,buf,cnt);err !=nil{
-			fmt.Println("ConnID",c.ConnID,"handle is err",err)
-			break
+		req := Request{
+			conn: c,
+			data: buf,
 		}
+
+		c.Router.PreHandle(&req)
+		//go func(request ziface.IRequest) {
+		//	c.Router.PreHandle(request)
+		//	c.Router.Handle(request)
+		//	c.Router.PostHandle(request)
+		//}(&req)
+
+		//调用当前连接所绑定的HandleAPI
+		//if err = c.HandleAPI(c.Conn,buf,cnt);err !=nil{
+		//	fmt.Println("ConnID",c.ConnID,"handle is err",err)
+		//	break
+		//}
 	}
 }
 
